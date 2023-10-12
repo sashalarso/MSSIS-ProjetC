@@ -138,6 +138,9 @@ int main(int argc, char *argv[]) {
         }
 
         char *found_strings[num_entries];
+        for (int i = 0; i < num_entries; i++) {
+            found_strings[i] = NULL; // Initialize to NULL
+        }
         int found = lookup_in_table(target_hash, table, num_entries, found_strings);
 
         if (found) {
