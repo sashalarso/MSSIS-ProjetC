@@ -4,7 +4,7 @@ Pré-requis à la compilation du programme :
 - make
 - libssl-dev
 - 
-Ces paquets sont à installer avec : apt-get install <paquet>
+Ces paquets sont à installer avec : apt-get install nom_du_paquet
 
 Pour compiler le programme taper : make
 
