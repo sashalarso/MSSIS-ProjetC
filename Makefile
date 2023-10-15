@@ -2,8 +2,8 @@ CC = gcc
 CFLAGS = -Wall 
 LIBS = -lcrypto -lssl
 
-SRC = test.c
-EXE = test
+SRC = src/main.c
+EXE = main
 
 all: $(EXE)
 
