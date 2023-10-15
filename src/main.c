@@ -152,6 +152,9 @@ int main(int argc, char *argv[]) {
         
 
         for (int i = 0; i < num_entries; i++) {
+            if (found_strings[i] != NULL) {
+            	free(found_strings[i]);
+        	}
             free(table[i]);
         }
         free(table);
