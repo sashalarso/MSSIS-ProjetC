@@ -4,6 +4,12 @@
 #include <openssl/evp.h>
 
 // Fonction pour générer un hachage SHA-256
+
+typedef struct {
+    char *hash;    // Le condensat (hash)
+    char *chaine;  // La chaîne claire associée
+} Entry;
+
 void sha256_hash_string(const char *string, unsigned char *output) {
     EVP_MD_CTX *mdctx;
     const EVP_MD *md;
@@ -19,7 +25,7 @@ void sha256_hash_string(const char *string, unsigned char *output) {
 }
 
 // Fonction pour charger la table de correspondance chaîne-condensat (T3C) depuis un fichier
-int load_table_from_file(const char *filename, char ***table, int *num_entries) {
+int load_table_from_file(const char *filename, Entry **table, int *num_entries) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Erreur lors de l'ouverture du fichier T3C");
@@ -28,28 +34,33 @@ int load_table_from_file(const char *filename, char ***table, int *num_entries) 
 
     char line[256];
     int max_entries = 100000000; // Un nombre arbitraire initial de lignes
-    *table = (char **)malloc(max_entries * sizeof(char *));
+    *table = (Entry *)malloc(max_entries * sizeof(Entry));
     if (*table == NULL) {
         perror("Erreur lors de l'allocation de mémoire");
         fclose(file);
         return 0;
     }
-    
+
     *num_entries = 0;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
-        (*table)[(*num_entries)++] = strdup(line);
-        
-        
+        char *hash = strtok(line, " -> ");
+        char *chaine = strtok(NULL, " -> ");
 
-        if (*num_entries >= max_entries) {
-            // Réallouer la mémoire pour plus de lignes si nécessaire
-            max_entries *= 2;
-            *table = (char **)realloc(*table, max_entries * sizeof(char *));
-            if (*table == NULL) {
-                perror("Erreur lors de la réallocation de mémoire");
-                fclose(file);
-                return 0;
+        if (hash != NULL && chaine != NULL) {
+            (*table)[*num_entries].hash = strdup(hash);
+            (*table)[*num_entries].chaine = strdup(chaine);
+            (*num_entries)++;
+
+            if (*num_entries >= max_entries) {
+                // Réallouer la mémoire pour plus d'entrées si nécessaire
+                max_entries *= 2;
+                *table = (Entry *)realloc(*table, max_entries * sizeof(Entry));
+                if (*table == NULL) {
+                    perror("Erreur lors de la réallocation de mémoire");
+                    fclose(file);
+                    return 0;
+                }
             }
         }
     }
@@ -58,25 +69,14 @@ int load_table_from_file(const char *filename, char ***table, int *num_entries) 
     return 1;
 }
 
-// Fonction pour rechercher une chaîne parmi les condensats dans la table T3C
-void lookup_in_table(const char *target_hash, char **table, int num_entries) {
-    
+void lookup_in_table(const char *target_hash, Entry *table, int num_entries) {
     for (int i = 0; i < num_entries; i++) {
-        char *line = strdup(table[i]);
-        char *condensat = strtok(line, " -> ");
-        char *chaine = strtok(NULL, " -> ");
-
-        
-
-        if (condensat != NULL && chaine != NULL && strcmp(condensat, target_hash) == 0) {
-                        
-            
-            printf("MATCH %s %s \n",condensat,chaine);
+        if (strcmp(target_hash, table[i].hash) == 0) {
+            printf("MATCH %s %s\n", target_hash, table[i].chaine);
         }
     }
-
-    
 }
+
 
 int main(int argc, char *argv[]) {
     if (argc != 4 && argc != 2 && argc !=3) {
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
         printf("Génération de condensats terminée. Les résultats ont été écrits dans %s.\n", output_file);
     } else if (argc == 3 && strcmp(argv[1], "-L") == 0) {
         // Mode L (recherche parmi une liste de condensats)
-        char **table = NULL;
+        Entry **table = NULL;
         int num_entries = 0;
 
         if (!load_table_from_file(argv[2], &table, &num_entries)) {
