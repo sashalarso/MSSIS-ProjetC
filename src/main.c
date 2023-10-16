@@ -27,7 +27,7 @@ int load_table_from_file(const char *filename, char ***table, int *num_entries) 
     }
 
     char line[256];
-    int max_entries = 100; // Un nombre arbitraire initial de lignes
+    int max_entries = 100000000; // Un nombre arbitraire initial de lignes
     *table = (char **)malloc(max_entries * sizeof(char *));
     if (*table == NULL) {
         perror("Erreur lors de l'allocation de mémoire");
@@ -59,10 +59,10 @@ int load_table_from_file(const char *filename, char ***table, int *num_entries) 
 }
 
 // Fonction pour rechercher une chaîne parmi les condensats dans la table T3C
-void lookup_in_table(const char *target_hash, char **table, int num_entries, char **found_strings) {
+void lookup_in_table(const char *target_hash, char **table, int num_entries) {
     
     for (int i = 0; i < num_entries; i++) {
-        char *line = table[i];
+        char *line = strdup(table[i]);
         char *chaine = strtok(line, " -> ");
         char *condensat = strtok(NULL, " -> ");
 
@@ -70,8 +70,8 @@ void lookup_in_table(const char *target_hash, char **table, int num_entries, cha
 
         if (condensat != NULL && chaine != NULL && strcmp(condensat, target_hash) == 0) {
                         
-            found_strings[i] = strdup(chaine);
-            printf("MATCH %s %s \n",condensat,found_strings[i]);
+            
+            printf("MATCH %s %s \n",condensat,chaine);
         }
     }
 
@@ -80,31 +80,27 @@ void lookup_in_table(const char *target_hash, char **table, int num_entries, cha
 
 int main(int argc, char *argv[]) {
     if (argc != 4 && argc != 2 && argc !=3) {
-        fprintf(stderr, "Utilisation : %s G <fichier_dictionnaire> <fichier_T3C> OU %s L <fichier_T3C>\n", argv[0], argv[0]);
+        fprintf(stderr, "Utilisation : %s -G <fichier_dictionnaire> <fichier_T3C> OU %s -L <fichier_T3C>\n", argv[0], argv[0]);
         return 1;
     }
 
-    if (argc == 4 && strcmp(argv[1], "G") == 0) {
+    if (argc == 3 && strcmp(argv[1], "-G") == 0) {
         // Mode G (génération de condensats)
-        const char *input_file = argv[2];
-        const char *output_file = argv[3];
+        
+        const char *output_file = argv[2];
 
-        FILE *input = fopen(input_file, "r");
-        if (input == NULL) {
-            perror("Erreur lors de l'ouverture du fichier dictionnaire");
-            return 1;
-        }
+       
 
         FILE *output = fopen(output_file, "w");
         if (output == NULL) {
             perror("Erreur lors de l'ouverture du fichier de sortie T3C");
-            fclose(input);
+            
             return 1;
         }
 
         char line[256];
         int j=0;
-        while (fgets(line, sizeof(line), input)) {
+        while (fgets(line, sizeof(line), stdin)) {
             line[strcspn(line, "\n")] = '\0'; 
             unsigned char sha256_hash[EVP_MAX_MD_SIZE]; 
 
@@ -122,11 +118,11 @@ int main(int argc, char *argv[]) {
             fprintf(output, "\n");
         }
 
-        fclose(input);
+        
         fclose(output);
 
         printf("Génération de condensats terminée. Les résultats ont été écrits dans %s.\n", output_file);
-    } else if (argc == 3 && strcmp(argv[1], "L") == 0) {
+    } else if (argc == 3 && strcmp(argv[1], "-L") == 0) {
         // Mode L (recherche parmi une liste de condensats)
         char **table = NULL;
         int num_entries = 0;
@@ -136,25 +132,19 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        char target_hash[65]; 
-        printf("Entrez le condensat à rechercher (en hexadécimal) : ");
-        if (scanf("%64s", target_hash) != 1) {
-            fprintf(stderr, "Erreur lors de la saisie du condensat.\n");
-            return 1;
-        }
+              
+    
 
-        char *found_strings[num_entries];
-        for (int i = 0; i < num_entries; i++) {
-            found_strings[i] = NULL; 
+        char hash[256];
+        while(fgets(hash,sizeof(hash),stdin)){
+            hash[strcspn(hash, "\n")] = '\0';
+            lookup_in_table(hash, table, num_entries);
         }
-        lookup_in_table(target_hash, table, num_entries, found_strings);
-
-        
+       
+              
 
         for (int i = 0; i < num_entries; i++) {
-            if (found_strings[i] != NULL) {
-            	free(found_strings[i]);
-        	}
+            
             free(table[i]);
         }
         free(table);
