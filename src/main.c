@@ -63,8 +63,8 @@ void lookup_in_table(const char *target_hash, char **table, int num_entries) {
     
     for (int i = 0; i < num_entries; i++) {
         char *line = strdup(table[i]);
-        char *chaine = strtok(line, " -> ");
-        char *condensat = strtok(NULL, " -> ");
+        char *condensat = strtok(line, " -> ");
+        char *chaine = strtok(NULL, " -> ");
 
         
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
 
             sha256_hash_string(line, sha256_hash);
 
-            fprintf(output, "%s -> ", line);
+            
             j++;
             if (j%50==0){
         	printf("INFO %d hashes written \n",j);
@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
                 fprintf(output, "%02x", sha256_hash[i]);
                 
             }
+            fprintf(output, " -> %s ", line);
             fprintf(output, "\n");
         }
 
@@ -132,7 +133,8 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-              
+        
+        
     
 
         char hash[256];
