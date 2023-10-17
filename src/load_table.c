@@ -5,7 +5,7 @@
 
 
 // Fonction pour charger la table de correspondance chaîne-condensat (T3C) depuis un fichier
-int load_table_from_file(const char *filename, Entry **table, int *num_entries,int max_entries) {
+int load_table_from_file(const char *filename, Entry **table, int *num_entries) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Erreur lors de l'ouverture du fichier T3C");
@@ -13,7 +13,7 @@ int load_table_from_file(const char *filename, Entry **table, int *num_entries,i
     }
 
     char line[256];
-    
+    int max_entries=100;
     *table = (Entry *)malloc(max_entries * sizeof(Entry));
     if (*table == NULL) {
         perror("Erreur lors de l'allocation de mémoire");

@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
         Entry **table = NULL;
         int num_entries = 0;
 
-        if (!load_table_from_file(argv[2], &table, &num_entries,j)) {
+        if (!load_table_from_file(argv[2], &table, &num_entries)) {
             fprintf(stderr, "Erreur lors du chargement de la table T3C.\n");
             return 1;
         }
