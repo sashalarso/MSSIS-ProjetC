@@ -55,12 +55,12 @@ int main(int argc, char *argv[]) {
             char hash[256];
             while (fgets(hash, sizeof(hash), stdin)) {
                 hash[strcspn(hash, "\n")] = '\0';
-                lookup_in_table(hash, root);
+                searchInTree(root, hash);
             }
             freeTree(root);
         }
     } else {
-        fprintf(stderr, "Mode invalide. Utilisation : G (generate) OU L (lookup)\n");
+        fprintf(stderr, "Mode invalide. Utilisation : -G (generate) OU -L (lookup)\n");
         return 1;
     }
 

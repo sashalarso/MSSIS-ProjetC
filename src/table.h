@@ -11,7 +11,6 @@ typedef struct TreeNode {
 void insert(TreeNode **root, const char *hash, const char *clair);
 void searchInTree(TreeNode *root, const char *target_hash);
 void freeTree(TreeNode *root);
-void lookup_in_table(const char *target_hash, TreeNode *root);
 TreeNode* load_table_from_file(const char *filename);
 void sha256_hash_string(const char *string, unsigned char *output);
 
