@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
             freeTree(root);
         }
     } else {
-        fprintf(stderr, "Mode invalide. Utilisation : -G (generate) OU -L (lookup)\n");
+        fprintf(stderr, "Mode invalide. Utilisation : -G <file> (generate) OU -L <table> (lookup)\n");
         return 1;
     }
 
