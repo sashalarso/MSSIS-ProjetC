@@ -2,7 +2,7 @@ Installation automatique (avec Dockerfile) :
 - CLoner le dépôt : `git clone https://github.com/sashalarso/MSSIS-ProjetC.git`
 - Se placer dedans `cd MSSIS-ProjetC`
 - Lancer Docker
-- Construire l'image `Docker build -t nom_image .`
+- Construire l'image `docker build -t nom_image .`
 - Lancer le conteneur : ` docker run -it nom_image`
 
 Installation manuelle (sans Dockerfile) :
