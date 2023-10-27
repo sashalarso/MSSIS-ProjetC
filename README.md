@@ -1,3 +1,5 @@
+Se placer dans un terminal Linux
+
 Installation automatique (avec Dockerfile) :
 - CLoner le dépôt : `git clone https://github.com/sashalarso/MSSIS-ProjetC.git`
 - Se placer dedans `cd MSSIS-ProjetC`
