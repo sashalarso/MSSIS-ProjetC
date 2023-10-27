@@ -12,6 +12,7 @@ WORKDIR /app
 
 COPY . /app
 
+RUN make clean
 
 RUN make
 
